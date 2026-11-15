@@ -1,6 +1,7 @@
 #cloud-config
 # Prepara il nodo per kubeadm (runtime, kernel, pacchetti).
-# NON crea il cluster: `kubeadm init` / `join` li fai tu a mano (è materia d'esame).
+# Con auto_bootstrap=true crea anche il cluster (kubeadm init/join + Cilium);
+# con auto_bootstrap=false init/join li fai tu a mano (è materia d'esame).
 
 users:
   - name: ${lab_user}
@@ -9,6 +10,15 @@ users:
     shell: /bin/bash
     ssh_authorized_keys:
       - ${ssh_public_key}
+
+# Password solo per la console seriale; via SSH si entra solo con la chiave
+chpasswd:
+  expire: false
+  users:
+    - name: ${lab_user}
+      password: ${lab_password}
+      type: text
+ssh_pwauth: false
 
 package_update: true
 packages:
@@ -46,6 +56,13 @@ write_files:
     content: |
       KUBELET_EXTRA_ARGS=--node-ip=${node_ip}
 
+  # Comodità da esame: alias k + autocompletamento
+  - path: /etc/profile.d/k8s.sh
+    content: |
+      source <(kubectl completion bash)
+      alias k=kubectl
+      complete -o default -F __start_kubectl k
+
   # Tutti i nodi si conoscono per nome
   - path: /etc/hosts
     append: true
@@ -82,6 +99,21 @@ runcmd:
   - |
     CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
     curl -fsSL "https://github.com/cilium/cilium-cli/releases/download/$${CILIUM_CLI_VERSION}/cilium-linux-amd64.tar.gz" | tar xz -C /usr/local/bin
+%{ endif ~}
+%{ if auto_bootstrap ~}
+%{ if role == "controlplane" ~}
+
+  # --- Bootstrap automatico: control plane ---
+  - kubeadm init --apiserver-advertise-address=${node_ip} --pod-network-cidr=${pod_cidr} --token=${kubeadm_token} --token-ttl=0
+  - mkdir -p /home/${lab_user}/.kube
+  - cp /etc/kubernetes/admin.conf /home/${lab_user}/.kube/config
+  - chown -R ${lab_user}:${lab_user} /home/${lab_user}/.kube
+  - HOME=/root KUBECONFIG=/etc/kubernetes/admin.conf cilium install --set ipam.mode=kubernetes
+%{ else ~}
+
+  # --- Bootstrap automatico: worker (riprova finché il control plane non risponde) ---
+  - until kubeadm join ${cp_ip}:6443 --token ${kubeadm_token} --discovery-token-unsafe-skip-ca-verification; do kubeadm reset -f; sleep 20; done
+%{ endif ~}
 %{ endif ~}
 
   # Segnale che il nodo è pronto

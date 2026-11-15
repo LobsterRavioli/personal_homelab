@@ -16,10 +16,29 @@ variable "lab_user" {
   default     = "student"
 }
 
+variable "lab_password" {
+  description = "Password di lab_user, solo per la console (virsh console). SSH resta solo a chiave."
+  type        = string
+  default     = "student"
+  sensitive   = true
+}
+
 variable "k8s_minor" {
   description = "Minor version di Kubernetes (repo pkgs.k8s.io). Allineala alla versione attuale dell'esame CKS."
   type        = string
   default     = "v1.35"
+}
+
+variable "auto_bootstrap" {
+  description = "true: kubeadm init/join + Cilium automatici. false: nodi solo preparati, il cluster lo crei tu (esercizio)."
+  type        = bool
+  default     = true
+}
+
+variable "pod_cidr" {
+  description = "Subnet dei pod (kubeadm --pod-network-cidr, usata da Cilium con ipam.mode=kubernetes)"
+  type        = string
+  default     = "10.244.0.0/16"
 }
 
 variable "storage_pool" {

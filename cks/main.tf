@@ -1,5 +1,24 @@
 locals {
   gib = 1024 * 1024 * 1024
+
+  controlplane_ip = one([for n in var.nodes : n.ip if n.role == "controlplane"])
+
+  # Formato richiesto da kubeadm: [a-z0-9]{6}.[a-z0-9]{16}
+  kubeadm_token = "${random_string.token_id.result}.${random_string.token_secret.result}"
+}
+
+# --- Token kubeadm ------------------------------------------------------------
+# Generato da Terraform così control plane e worker lo conoscono in anticipo.
+resource "random_string" "token_id" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
+resource "random_string" "token_secret" {
+  length  = 16
+  special = false
+  upper   = false
 }
 
 # --- Rete -------------------------------------------------------------------
@@ -47,12 +66,17 @@ resource "libvirt_cloudinit_disk" "seed" {
 
   user_data = templatefile("${path.module}/cloud-init/user-data.yaml.tftpl", {
     lab_user       = var.lab_user
+    lab_password   = var.lab_password
     ssh_public_key = trimspace(file(pathexpand(var.ssh_public_key)))
     k8s_minor      = var.k8s_minor
     role           = each.value.role
     node_ip        = each.value.ip
     nodes          = var.nodes
     domain         = var.domain
+    auto_bootstrap = var.auto_bootstrap
+    pod_cidr       = var.pod_cidr
+    kubeadm_token  = local.kubeadm_token
+    cp_ip          = local.controlplane_ip
   })
 
   meta_data = yamlencode({
