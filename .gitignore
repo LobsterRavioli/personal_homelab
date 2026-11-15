@@ -1,0 +1,7 @@
+# Terraform: plugin scaricati e stato locale (lo stato può contenere dati sensibili)
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+# .terraform.lock.hcl invece VA committato: fissa le versioni esatte dei provider

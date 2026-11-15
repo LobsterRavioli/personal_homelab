@@ -1,0 +1,23 @@
+#cloud-config
+# Provisioning MINIMO di proposito: rete, repo, firewall, servizi... sono gli esercizi.
+
+users:
+  - name: ${lab_user}
+    groups: wheel
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+
+# Password di root per la console (virsh console / VNC)
+chpasswd:
+  expire: false
+  users:
+    - name: root
+      password: ${root_password}
+      type: text
+
+runcmd:
+  # Dopo il primo boot cloud-init si disattiva: così non sovrascrive
+  # hostname, rete o utenti che modifichi durante gli esercizi.
+  - touch /etc/cloud/cloud-init.disabled
