@@ -1,4 +1,4 @@
-# personal_homelab
+# Personal Homelab
 
 My homelab. I use it to practice for certifications, try new stacks and self-host a few services.
 
