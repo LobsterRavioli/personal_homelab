@@ -59,3 +59,8 @@ flowchart LR
 | 192.168.1.2 – .200 | DHCP (modem) |
 | 192.168.1.201 – .254 | Static: nodes |
 | 10.42.0.0/16 · 10.43.0.0/16 | Pods · services of the home cluster |
+
+## Index
+
+- [CKS lab](labs/cks/README.md)
+- [RHCSA lab](labs/rhcsa/README.md)
