@@ -57,7 +57,7 @@ output "connect" {
     Nota: cloud-init è disattivato dopo il primo boot, quindi hostname,
     rete e utenti che modifichi restano come li lasci.
 
-    6) Gestione del lab (da ~/personal_homelab/rhcsa):
+    6) Gestione del lab (da ~/personal_homelab/labs/rhcsa):
          terraform output -raw connect     # rivedi questa guida
          terraform apply                   # (ri)crea il lab
          terraform destroy                 # spegni tutto e libera la RAM

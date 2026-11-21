@@ -51,7 +51,7 @@ output "connect" {
          kubectl get nodes
        Per tornare a k3s:  unset KUBECONFIG
 
-    5) Gestione del lab (da ~/personal_homelab/cks):
+    5) Gestione del lab (da ~/personal_homelab/labs/cks):
          terraform output -raw connect          # rivedi questa guida
          terraform apply -var auto_bootstrap=false   # nodi puliti, cluster a mano
          terraform destroy                      # spegni tutto e libera la RAM

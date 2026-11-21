@@ -2,6 +2,14 @@
 
 My homelab. I use it to practice for certifications, try new stacks and self-host a few services.
 
+```
+.
+├── README.md
+└── labs/
+    ├── cks/      # kubeadm cluster for CKS practice
+    └── rhcsa/    # Rocky Linux VMs for RHCSA practice
+```
+
 ## Topology
 
 ### Home network
@@ -81,8 +89,8 @@ Each lab is a Terraform project that creates VMs on kube-01 through the `dmacvic
 
 | Dir | For | VMs |
 |-----|-----|-----|
-| `cks/` | CKS | controlplane, worker1, worker2 (Ubuntu 24.04, kubeadm, Cilium) |
-| `rhcsa/` | RHCSA | server1, server2 (Rocky Linux 9, extra empty disks) |
+| `labs/cks/` | CKS | controlplane, worker1, worker2 (Ubuntu 24.04, kubeadm, Cilium) |
+| `labs/rhcsa/` | RHCSA | server1, server2 (Rocky Linux 9, extra empty disks) |
 
 `cks` builds the cluster on its own by default. Set `auto_bootstrap=false` to get prepared nodes and run `kubeadm init/join` yourself.
 
@@ -102,7 +110,7 @@ Each lab is a Terraform project that creates VMs on kube-01 through the `dmacvic
 ### Usage
 
 ```bash
-cd cks                          # or rhcsa
+cd labs/cks                     # or labs/rhcsa
 terraform init
 terraform apply
 terraform output -raw connect   # SSH, console and VNC instructions
