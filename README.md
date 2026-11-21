@@ -85,40 +85,7 @@ flowchart TB
 
 ## Labs
 
-Each lab is a Terraform project that creates VMs on kube-01 through the `dmacvicar/libvirt` provider (pinned to 0.8.3).
-
-| Dir | For | VMs |
-|-----|-----|-----|
-| `labs/cks/` | CKS | controlplane, worker1, worker2 (Ubuntu 24.04, kubeadm, Cilium) |
-| `labs/rhcsa/` | RHCSA | server1, server2 (Rocky Linux 9, extra empty disks) |
-
-`cks` builds the cluster on its own by default. Set `auto_bootstrap=false` to get prepared nodes and run `kubeadm init/join` yourself.
-
-`rhcsa` does almost nothing on purpose: a user, an SSH key and a root password. The rest is the exercise.
-
-### Host requirements
-
-- KVM/QEMU and libvirt, with your user in the `libvirt` and `kvm` groups
-- `genisoimage` (the provider uses it to build the cloud-init ISO)
-- Terraform >= 1.5
-- A libvirt storage pool called `default`
-- `~/.ssh/id_ed25519.pub`
-- Cloud images in `~/images`:
-  - [noble-server-cloudimg-amd64.img](https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img)
-  - [Rocky-9-GenericCloud-Base.latest.x86_64.qcow2](https://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2)
-
-### Usage
-
-```bash
-cd labs/cks                     # or labs/rhcsa
-terraform init
-terraform apply
-terraform output -raw connect   # SSH, console and VNC instructions
-terraform destroy               # free the RAM when done
-```
-
-### Notes
-
-- `terraform.tfstate` is not committed: it holds the kubeadm token and other secrets.
-- Default passwords (`student` for the CKS console, `redhat` for RHCSA root) are lab-only. Override them in a `terraform.tfvars`, which is gitignored.
-- Recreating the VMs changes their SSH host keys. Clear the old ones with `ssh-keygen -R <ip>`.
+| Lab | For | Details |
+|-----|-----|---------|
+| [labs/cks](labs/cks) | CKS | 3-node kubeadm cluster with Cilium |
+| [labs/rhcsa](labs/rhcsa) | RHCSA | 2 Rocky Linux VMs with spare disks |
